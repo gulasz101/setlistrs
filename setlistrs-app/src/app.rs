@@ -4,6 +4,11 @@ use yew::prelude::*;
 
 #[function_component(App)]
 pub fn app() -> Html {
+    html! {<AllSongsList/>}
+}
+
+#[function_component(AllSongsList)]
+pub fn all_songs_list() -> Html {
     let setlist = use_state(|| None);
 
     {
