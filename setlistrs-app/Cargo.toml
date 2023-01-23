@@ -16,3 +16,4 @@ setlistrs-types = { path="../setlistrs-types" }
 gloo-net = "0.2.5"
 serde = { version = "1.0.152", features = ["derive"] }
 wasm-bindgen-futures = "0.4.33"
+yew-router = "0.17.0"
