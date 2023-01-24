@@ -33,21 +33,19 @@ pub fn all_songs_list() -> Html {
     }
 
     html! {
-            <x-grid columns="8" class="margin20">
-            <x-cell span="row" span-s="row">
-                <table>
-                            <caption>{ "Setlist" }</caption>
-                <thead>
-                    <th>{ "Song" }</th>
-                    <th>{ "Cover" }</th>
-                    <th>{ "Chords" }</th>
-                </thead>
-                <tbody>
-                {match &*setlist {
-                    Some(setlist) => {
-                        html! {
-
-                 for setlist.data.iter().map(|song|
+    <table>
+        <caption>{ "Setlist" }</caption>
+    <thead>
+        <th>{ "Song" }</th>
+        <th>{ "Cover" }</th>
+        <th>{ "Chords" }</th>
+    </thead>
+    <tbody>
+    {
+        match &*setlist {
+            Some(setlist) => {
+                html! {
+                    for setlist.data.iter().map(|song|
                     html! {
                         <tr>
                             <td>{ song.name.clone() }</td>
@@ -59,19 +57,16 @@ pub fn all_songs_list() -> Html {
                             <td>{ song.chords.clone() }</td>
                         </tr>
                     })
-
-                        }
-                    },
-                    None => html! {
-    <tr>
-        <td>{"No data"}</td>
-        </tr>
-                    },
                 }
-                }
-                </tbody>
-                </table>
-            </x-cell>
-            </x-grid>
+            },
+            None => html! {
+                <tr>
+                    <td>{"No data"}</td>
+                </tr>
+            },
         }
+    }
+    </tbody>
+    </table>
+    }
 }

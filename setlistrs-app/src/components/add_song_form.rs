@@ -18,20 +18,11 @@ fn add_yt_link(props: &YtLinkProps) -> Html {
         })
     };
     html! {
-        <x-grid columns="7" class="margin20">
-
-            <x-cell span="1-3" span-s="row">
-                <input placeholder={"title"}/>
-            </x-cell>
-
-            <x-cell span="4-6" span-s="row">
-                <input placeholder={"yt-url"}/>
-            </x-cell>
-
-            <x-cell span="7.." span-s="row">
-                <button title={"Another link"} onclick={on_another_link_click}>{"+"}</button>
-            </x-cell>
-        </x-grid>
+        <div class={classes!("grid")}>
+            <input placeholder={"title"}/>
+            <input placeholder={"yt-url"}/>
+            <button title={"Another link"} onclick={on_another_link_click}>{"+"}</button>
+        </div>
     }
 }
 
@@ -75,47 +66,24 @@ pub fn add_song_form() -> Html {
     let onsubmit = { Callback::from(move |event: SubmitEvent| event.prevent_default()) };
 
     html! {
-    <x-grid columns="8" class="margin20">
-        <x-cell span="row" span-s="row">
-            <fieldset >
-                <legend>{ "New song" }</legend>
-                <form onsubmit={onsubmit}>
-                    <x-grid columns="7" class="margin20">
-                        <x-cell span="row">
-                            <input name="song_title" placeholder={"song title"}/>
-                        </x-cell>
-                    </x-grid>
-                    {
-                        for yt_links_state.list.iter().cloned().map(|last_id|
+        <article>
+            <form onsubmit={onsubmit}>
+                <input name="song_title" placeholder={"song title"}/>
+                {
+                    for yt_links_state.list.iter().cloned().map(|last_id|
                         html! {
                             <AddYTLink last_id={last_id.clone()} onadd={on_yt_link_add.clone()} />
                         }
-                                                      )
-                    }
+                    )
+                }
 
-                    <x-grid columns="7" class="margin20">
-                        <x-cell span="1-3" span-s="row">
-                            <input name="cover_url" placeholder={"cover url"}/>
-                        </x-cell>
-                        <x-cell span="4-6" span-s="row">
-                            <input name="cover_title" placeholder={"cover display title"}/>
-                        </x-cell>
-                    </x-grid>
+                <input name="cover_url" placeholder={"cover url"}/>
+                <input name="cover_title" placeholder={"cover display title"}/>
 
-                    <x-grid columns="7" class="margin20">
-                        <x-cell span="row">
-                            <input name="chords" placeholder={"chords, ex: b G D A"}/>
-                        </x-cell>
-                    </x-grid>
+                <input name="chords" placeholder={"chords, ex: b G D A"}/>
 
-                    <x-grid columns="7" class="margin20">
-                        <x-cell span="row">
-                            <button type={"submit"} >{ "Add new song" }</button>
-                        </x-cell>
-                    </x-grid>
-                </form>
-            </fieldset>
-        </x-cell>
-    </x-grid>
-                    }
+                <button type={"submit"} >{ "Add new song" }</button>
+            </form>
+        </article>
+    }
 }

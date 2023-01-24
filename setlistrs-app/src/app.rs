@@ -30,7 +30,7 @@ pub fn nav_items() -> Html {
         let navigator = navigator.clone();
         let onclick = Callback::from(move |_| navigator.push(&Route::AllSongsList));
         html! {
-            <button {onclick}>{ "To all songs list" }</button>
+            <button {onclick}>{ "All songs" }</button>
         }
     };
 
@@ -38,32 +38,33 @@ pub fn nav_items() -> Html {
         let navigator = navigator.clone();
         let onclick = Callback::from(move |_| navigator.push(&Route::AddSong));
         html! {
-            <button {onclick}>{ "To add new song form" }</button>
+            <button {onclick}>{ "Add new song" }</button>
         }
     };
 
     html! {
-            <ul>
+        <ul>
             <li>{ all_songs_list_button }</li>
             <li>{ add_song_button }</li>
-    // <Link<Route> to={Route::AllSongsList}>{ "-> To all songs list." }</Link<Route>>
-    // <Link<Route> to={Route::AddSong}>{ "-> To add song form." }</Link<Route>>
-            </ul>
-        }
+        </ul>
+    }
 }
 
 #[function_component(App)]
 pub fn app() -> Html {
     html! {
-        <div id="app">
-        <main>
-
         <BrowserRouter>
-        <NavItems />
-           <Switch<Route> render={switch} />
+            <header>
+                <hgroup>
+                    <h1>{ "setlistrs" }</h1>
+                </hgroup>
+                <nav>
+                    <NavItems />
+                </nav>
+            </header>
+            <main class={classes!("container")}>
+                <Switch<Route> render={switch} />
+            </main>
         </BrowserRouter>
-
-        </main>
-        </div>
     }
 }
