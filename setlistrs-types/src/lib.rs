@@ -1,15 +1,15 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct Cover {
+pub struct YTLink {
     pub url: String,
-    pub description: String,
+    pub display_title: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Song {
     pub name: String,
-    pub cover: Option<Cover>,
+    pub cover: Option<Vec<YTLink>>,
     pub chords: String,
 }
 

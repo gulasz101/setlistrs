@@ -50,7 +50,12 @@ pub fn all_songs_list() -> Html {
                         <tr>
                             <td>{ song.name.clone() }</td>
                             <td>{ match &song.cover {
-                                Some(cover) => html! {<a href={ cover.url.clone() } target="_blank">{ cover.description.clone() }</a>},
+                                Some(cover) => html! {<a href={ cover[0].url.clone() } target="_blank">{
+                                    match cover[0].display_title.clone() {
+                                        Some(display_title) => display_title,
+                                        None => cover[0].url.clone(),
+                                    }
+                                }</a>},
                                 None => "".into(),
                                 }
                             }</td>

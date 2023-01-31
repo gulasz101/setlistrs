@@ -1,3 +1,6 @@
+use gloo_net::http::Request;
+use setlistrs_types::{Song, YTLink};
+use web_sys::FormData;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
@@ -19,8 +22,8 @@ fn add_yt_link(props: &YtLinkProps) -> Html {
     };
     html! {
         <div class={classes!("grid")}>
-            <input placeholder={"title"}/>
-            <input placeholder={"yt-url"}/>
+            <input name={ "url_title" } data-id={ props.last_id.clone().to_string() } placeholder={"url title"}/>
+            <input name={ "url" } data-id= { props.last_id.clone().to_string() } placeholder={"yt-url"}/>
             <button title={"Another link"} onclick={on_another_link_click}>{"+"}</button>
         </div>
     }
@@ -63,12 +66,41 @@ pub fn add_song_form() -> Html {
         })
     };
 
-    let onsubmit = { Callback::from(move |event: SubmitEvent| event.prevent_default()) };
+    let onsubmit = {
+        Callback::from(move |e: SubmitEvent| {
+            e.prevent_default();
+
+            let form_data: FormData = FormData::new_with_form(&e.target_unchecked_into())
+                .expect("This will work since we have only one form.");
+
+            form_data.get("song_title");
+
+            let cover_yt_link = YTLink {
+                url: match form_data.get("cover_url").as_string() {
+                    Some(value) => value,
+                    None => todo!(),
+                },
+                display_title: form_data.get("cover_title").as_string(),
+            };
+
+            wasm_bindgen_futures::spawn_local(async move {
+                let _response = Request::post("http://127.0.0.1:8081/songs")
+                    .json(&Song {
+                        name: form_data.get("song_title").as_string().unwrap(),
+                        cover: Some(vec![cover_yt_link]),
+                        chords: form_data.get("chords").as_string().unwrap(),
+                    })
+                    .expect("This will work")
+                    .send()
+                    .await;
+            });
+        })
+    };
 
     html! {
         <article>
             <form onsubmit={onsubmit}>
-                <input name="song_title" placeholder={"song title"}/>
+                <input name="song_title" placeholder={"song title"} value={"get lucky"}/>
                 {
                     for yt_links_state.list.iter().cloned().map(|last_id|
                         html! {
@@ -77,10 +109,10 @@ pub fn add_song_form() -> Html {
                     )
                 }
 
-                <input name="cover_url" placeholder={"cover url"}/>
-                <input name="cover_title" placeholder={"cover display title"}/>
+                <input name="cover_url" placeholder={"cover url"} value={"http//get-lucky.yt"}/>
+                <input name="cover_title" placeholder={"cover display title"} value={"get lucky at metro"}/>
 
-                <input name="chords" placeholder={"chords, ex: b G D A"}/>
+                <input name="chords" placeholder={"chords, ex: b G D A"} value={"C D G E"}/>
 
                 <button type={"submit"} >{ "Add new song" }</button>
             </form>
