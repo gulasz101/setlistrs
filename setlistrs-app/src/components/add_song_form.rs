@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use gloo_net::http::Request;
 use setlistrs_types::{Song, YTLink};
 use web_sys::FormData;
@@ -22,8 +24,8 @@ fn add_yt_link(props: &YtLinkProps) -> Html {
     };
     html! {
         <div class={classes!("grid")}>
-            <input name={ "url_title" } data-id={ props.last_id.clone().to_string() } placeholder={"url title"}/>
-            <input name={ "url" } data-id= { props.last_id.clone().to_string() } placeholder={"yt-url"}/>
+            <input name={ format!("url_title_{}", props.last_id.clone().to_string()) } placeholder={"url title"}/>
+            <input name={ format!("url_{}", props.last_id.clone().to_string()) } placeholder={"yt-url"}/>
             <button title={"Another link"} onclick={on_another_link_click}>{"+"}</button>
         </div>
     }
@@ -67,13 +69,25 @@ pub fn add_song_form() -> Html {
     };
 
     let onsubmit = {
+        let yt_links_state = yt_links_state.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
 
             let form_data: FormData = FormData::new_with_form(&e.target_unchecked_into())
                 .expect("This will work since we have only one form.");
 
-            form_data.get("song_title");
+            let yt_links: Vec<YTLink> = yt_links_state
+                .deref()
+                .list
+                .iter()
+                .map(|link_id| YTLink {
+                    url: match form_data.get(&format!("url_{}", link_id)).as_string() {
+                        Some(url) => url.into(),
+                        None => todo!(),
+                    },
+                    display_title: form_data.get(&format!("url_title_{}", link_id)).as_string(),
+                })
+                .collect();
 
             let cover_yt_link = YTLink {
                 url: match form_data.get("cover_url").as_string() {
@@ -87,6 +101,7 @@ pub fn add_song_form() -> Html {
                 let _response = Request::post("http://127.0.0.1:8081/songs")
                     .json(&Song {
                         name: form_data.get("song_title").as_string().unwrap(),
+                        source: yt_links,
                         cover: Some(vec![cover_yt_link]),
                         chords: form_data.get("chords").as_string().unwrap(),
                     })

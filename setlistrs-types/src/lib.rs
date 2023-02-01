@@ -9,6 +9,7 @@ pub struct YTLink {
 #[derive(Serialize, Deserialize)]
 pub struct Song {
     pub name: String,
+    pub source: Vec<YTLink>,
     pub cover: Option<Vec<YTLink>>,
     pub chords: String,
 }

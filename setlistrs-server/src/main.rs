@@ -10,6 +10,7 @@ async fn setlist() -> Json<Setlist> {
 
     songs.push(Song {
         name: "despacito / lambada / shivers / balaba boa".into(),
+        source: vec![],
         cover: Some(vec![YTLink {
             url: "https://youtu.be/lvAvaUhDBNA".into(),
             display_title: Some("metro".into()),
@@ -19,6 +20,7 @@ async fn setlist() -> Json<Setlist> {
 
     songs.push(Song {
         name: "gasolina".into(),
+        source: vec![],
         cover: Some(vec![YTLink {
             url: "https://youtu.be/jSTk8-ZJhd4".into(),
             display_title: None,
