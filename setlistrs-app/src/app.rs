@@ -4,7 +4,7 @@ use yew_router::prelude::*;
 use crate::components::{AddSongForm, AllSongsList};
 
 #[derive(Clone, Routable, PartialEq)]
-enum Route {
+pub enum Route {
     #[at("/")]
     AllSongsList,
     #[at("/add-song")]

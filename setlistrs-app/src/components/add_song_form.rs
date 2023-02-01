@@ -4,6 +4,9 @@ use gloo_net::http::Request;
 use setlistrs_types::{Song, YTLink};
 use web_sys::FormData;
 use yew::prelude::*;
+use yew_router::prelude::use_navigator;
+
+use crate::app::Route;
 
 #[derive(Clone, PartialEq, Properties)]
 struct YtLinkProps {
@@ -60,6 +63,7 @@ pub fn add_song_form() -> Html {
     let yt_links_state = use_reducer(|| YtLinksAdded {
         list: Vec::from([1]),
     });
+    let navigator = use_navigator().expect("There is no reason it will not work.");
 
     let on_yt_link_add = {
         let yt_links_state = yt_links_state.clone();
@@ -70,7 +74,10 @@ pub fn add_song_form() -> Html {
 
     let onsubmit = {
         let yt_links_state = yt_links_state.clone();
+        let navigator = navigator.clone();
+
         Callback::from(move |e: SubmitEvent| {
+            let navigator = navigator.clone();
             e.prevent_default();
 
             let form_data: FormData = FormData::new_with_form(&e.target_unchecked_into())
@@ -108,6 +115,8 @@ pub fn add_song_form() -> Html {
                     .expect("This will work")
                     .send()
                     .await;
+
+                navigator.push(&Route::AllSongsList);
             });
         })
     };
