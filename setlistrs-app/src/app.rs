@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::components::{add_song_form::AddSongForm, all_songs_list::AllSongsList};
+use crate::components::{AddSongForm, AllSongsList};
 
 #[derive(Clone, Routable, PartialEq)]
 enum Route {
