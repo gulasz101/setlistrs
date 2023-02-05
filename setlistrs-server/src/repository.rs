@@ -25,7 +25,7 @@ pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
         source_link_ids.push(persist_link(&mut transaction, &yt_link).await?);
     }
 
-    let cover_link_ids = match song.clone().cover {
+    let cover_link_ids = match &song.cover {
         Some(yt_links) => {
             // let tasks = JoinSet::new();
             let mut cover_link_ids = Vec::new();
@@ -45,10 +45,22 @@ pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
         None => todo!(),
     };
     for source_link_id in source_link_ids {
-        persist_song_link_relation(&mut transaction, song_id, source_link_id).await?;
+        persist_song_link_relation(
+            &mut transaction,
+            LinkRelationType::Source,
+            song_id,
+            source_link_id,
+        )
+        .await?;
     }
     for cover_link_id in cover_link_ids {
-        persist_song_link_relation(&mut transaction, song_id, cover_link_id).await?;
+        persist_song_link_relation(
+            &mut transaction,
+            LinkRelationType::Cover,
+            song_id,
+            cover_link_id,
+        )
+        .await?;
     }
 
     transaction.commit().await?;
@@ -70,19 +82,35 @@ async fn persist_link(transaction: &mut Transaction<'_, Sqlite>, yt_link: &YTLin
     .last_insert_rowid())
 }
 
+enum LinkRelationType {
+    Cover,
+    Source,
+}
+
 async fn persist_song_link_relation(
     transaction: &mut Transaction<'_, Sqlite>,
+    link_type: LinkRelationType,
     song_id: i64,
     link_id: i64,
 ) -> Result<i64> {
-    Ok(query!(
-        r#"
+    Ok(match link_type {
+        LinkRelationType::Cover => query!(
+            r#"
             INSERT INTO covers(song_id, link_id)
             VALUES(?, ?)
                "#,
-        song_id,
-        link_id
-    )
+            song_id,
+            link_id
+        ),
+        LinkRelationType::Source => query!(
+            r#"
+            INSERT INTO sources(song_id, link_id)
+            VALUES(?, ?)
+               "#,
+            song_id,
+            link_id
+        ),
+    }
     .execute(transaction)
     .await?
     .last_insert_rowid())
