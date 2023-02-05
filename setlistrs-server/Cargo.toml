@@ -9,3 +9,7 @@ edition = "2021"
 setlistrs-types = { path="../setlistrs-types/" }
 actix-web = "4.2.1"
 actix-cors = "0.6.4"
+tokio = { version = "1.25.0", features = ["macros"] }
+sqlx = { version = "0.6.2", features = ["runtime-tokio-rustls", "sqlite"] }
+anyhow = "1.0.68"
+dotenvy = "0.15.6"
