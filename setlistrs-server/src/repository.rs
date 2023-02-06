@@ -27,19 +27,11 @@ pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
 
     let cover_link_ids = match &song.cover {
         Some(yt_links) => {
-            // let tasks = JoinSet::new();
             let mut cover_link_ids = Vec::new();
             for yt_link in yt_links {
                 cover_link_ids.push(persist_link(&mut transaction, &yt_link).await?);
-                // tasks.spawn(async move { persist_link(&mut transaction, &yt_link).await });
             }
 
-            // while let Some(task) = tasks.join_next().await {
-            //     match task {
-            //         Ok(cover_link_id) => cover_link_ids.push(cover_link_id),
-            //         Err(e) => todo!(),
-            //     }
-            // }
             cover_link_ids
         }
         None => todo!(),
