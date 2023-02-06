@@ -5,7 +5,7 @@ use actix_web::web::{Data, Json};
 use actix_web::HttpResponse;
 use actix_web::{get, post, App, HttpServer};
 use dotenvy::dotenv;
-use setlistrs_types::{Setlist, SongPersist, YTLinkPersist};
+use setlistrs_types::{Setlist, Song, YTLink};
 use sqlx::SqlitePool;
 
 mod repository;
@@ -14,20 +14,20 @@ mod repository;
 async fn setlist() -> Json<Setlist> {
     let mut songs = Vec::new();
 
-    songs.push(SongPersist {
+    songs.push(Song {
         name: "despacito / lambada / shivers / balaba boa".into(),
         source: vec![],
-        cover: Some(vec![YTLinkPersist {
+        cover: Some(vec![YTLink {
             url: "https://youtu.be/lvAvaUhDBNA".into(),
             display_title: Some("metro".into()),
         }]),
         chords: "b G D A".into(),
     });
 
-    songs.push(SongPersist {
+    songs.push(Song {
         name: "gasolina".into(),
         source: vec![],
-        cover: Some(vec![YTLinkPersist {
+        cover: Some(vec![YTLink {
             url: "https://youtu.be/jSTk8-ZJhd4".into(),
             display_title: None,
         }]),
@@ -38,7 +38,7 @@ async fn setlist() -> Json<Setlist> {
 }
 
 #[post("/songs")]
-async fn persist_song(song: Json<SongPersist>, pool: Data<SqlitePool>) -> HttpResponse {
+async fn persist_song(song: Json<Song>, pool: Data<SqlitePool>) -> HttpResponse {
     match crate::repository::persist_song(pool.get_ref(), song.into_inner()).await {
         Ok(song) => HttpResponse::Created().json(song),
         Err(_e) => HttpResponse::InternalServerError().into(),

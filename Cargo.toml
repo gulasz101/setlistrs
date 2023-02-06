@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
+  "setlistrs-types",
   "setlistrs-server",
-  "setlistrs-app",
-  "setlistrs-types"
+  "setlistrs-app"
 ]

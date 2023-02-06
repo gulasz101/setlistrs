@@ -1,21 +1,37 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct YTLinkPersist {
+#[derive(Serialize, Deserialize, Clone, FromRow, Debug)]
+pub struct YTLink {
     pub url: String,
     pub display_title: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct SongPersist {
+pub struct YTLinkDetails {
+    pub id: i64,
+    pub url: String,
+    pub display_title: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Song {
     pub name: String,
-    pub source: Vec<YTLinkPersist>,
-    pub cover: Option<Vec<YTLinkPersist>>,
+    pub source: Vec<YTLink>,
+    pub cover: Option<Vec<YTLink>>,
     pub chords: String,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct SongDetails {
+    pub id: i64,
+    pub name: String,
+    pub source: Vec<YTLinkDetails>,
+    pub cover: Option<Vec<YTLinkDetails>>,
+    pub chords: String,
+}
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Setlist {
-    pub data: Vec<SongPersist>,
+    pub data: Vec<(i64, Song)>,
 }

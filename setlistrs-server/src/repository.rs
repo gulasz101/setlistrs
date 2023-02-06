@@ -1,11 +1,80 @@
 use anyhow::Result;
-use setlistrs_types::SongPersist;
-use setlistrs_types::YTLinkPersist;
+use setlistrs_types::Song;
+use setlistrs_types::YTLink;
+use sqlx::query;
+use sqlx::query_as;
 use sqlx::Sqlite;
+use sqlx::SqlitePool;
 use sqlx::Transaction;
-use sqlx::{query, SqlitePool};
 
-pub async fn persist_song(pool: &SqlitePool, song: SongPersist) -> Result<SongPersist> {
+pub async fn list_all_songs(pool: &SqlitePool) -> Result<Vec<(i64, Song)>> {
+    let songs: Vec<(i64, Song)> = query!(
+        r#"
+SELECT id, name, chords 
+FROM songs
+ORDER BY id
+        "#
+    )
+    .fetch_all(pool)
+    .await?
+    .into_iter()
+    .map(|song| {
+        (
+            song.id,
+            Song {
+                name: match song.name {
+                    Some(name) => name.into(),
+                    None => "".into(),
+                },
+                source: Vec::new(),
+                chords: match song.chords {
+                    Some(chords) => chords.into(),
+                    None => "".into(),
+                },
+                cover: None,
+            },
+        )
+    })
+    .collect();
+
+    songs.into_iter().for_each(async |(song_id, mut song)| {
+        let cover = query!(
+            r#"
+SELECT l.url, l.display_title FROM covers c, links l 
+WHERE c.song_id = ? 
+AND l.id = c.link_id
+ORDER BY c.id
+            "#,
+            song_id
+        )
+        .map(|link| YTLink {
+            url: match link.url {
+                Some(url) => url.into(),
+                None => "".into(),
+            },
+            display_title: link.display_title,
+        })
+        .fetch_one(pool)
+        .await
+        .unwrap();
+        song.cover = Some(vec![cover]);
+    });
+    //     let song_ids = songs.iter().map(|(song_id, _song)| song_id);
+    //     query!(
+    //         r#"
+    // SELECT *
+    // FROM sources
+    // WHERE song_id = ANY($1)
+    //         "#,
+    //         &song_ids
+    //     )
+    //     .fetch_all(pool)
+    //     .await?;
+
+    Ok(songs)
+}
+
+pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
     let mut transaction = pool.begin().await?;
 
     let song_id = query!(
@@ -60,10 +129,7 @@ pub async fn persist_song(pool: &SqlitePool, song: SongPersist) -> Result<SongPe
     Ok(song)
 }
 
-async fn persist_link(
-    transaction: &mut Transaction<'_, Sqlite>,
-    yt_link: &YTLinkPersist,
-) -> Result<i64> {
+async fn persist_link(transaction: &mut Transaction<'_, Sqlite>, yt_link: &YTLink) -> Result<i64> {
     Ok(query!(
         r#"
                 INSERT INTO links(display_title, url)
