@@ -1,11 +1,11 @@
 use anyhow::Result;
-use setlistrs_types::Song;
-use setlistrs_types::YTLink;
+use setlistrs_types::SongPersist;
+use setlistrs_types::YTLinkPersist;
 use sqlx::Sqlite;
 use sqlx::Transaction;
 use sqlx::{query, SqlitePool};
 
-pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
+pub async fn persist_song(pool: &SqlitePool, song: SongPersist) -> Result<SongPersist> {
     let mut transaction = pool.begin().await?;
 
     let song_id = query!(
@@ -60,7 +60,10 @@ pub async fn persist_song(pool: &SqlitePool, song: Song) -> Result<Song> {
     Ok(song)
 }
 
-async fn persist_link(transaction: &mut Transaction<'_, Sqlite>, yt_link: &YTLink) -> Result<i64> {
+async fn persist_link(
+    transaction: &mut Transaction<'_, Sqlite>,
+    yt_link: &YTLinkPersist,
+) -> Result<i64> {
     Ok(query!(
         r#"
                 INSERT INTO links(display_title, url)

@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use gloo_net::http::Request;
-use setlistrs_types::{Song, YTLink};
+use setlistrs_types::{SongPersist, YTLinkPersist};
 use web_sys::FormData;
 use yew::prelude::*;
 use yew_router::prelude::use_navigator;
@@ -83,11 +83,11 @@ pub fn add_song_form() -> Html {
             let form_data: FormData = FormData::new_with_form(&e.target_unchecked_into())
                 .expect("This will work since we have only one form.");
 
-            let yt_links: Vec<YTLink> = yt_links_state
+            let yt_links: Vec<YTLinkPersist> = yt_links_state
                 .deref()
                 .list
                 .iter()
-                .map(|link_id| YTLink {
+                .map(|link_id| YTLinkPersist {
                     url: match form_data.get(&format!("url_{}", link_id)).as_string() {
                         Some(url) => url.into(),
                         None => todo!(),
@@ -96,7 +96,7 @@ pub fn add_song_form() -> Html {
                 })
                 .collect();
 
-            let cover_yt_link = YTLink {
+            let cover_yt_link = YTLinkPersist {
                 url: match form_data.get("cover_url").as_string() {
                     Some(value) => value,
                     None => todo!(),
@@ -106,7 +106,7 @@ pub fn add_song_form() -> Html {
 
             wasm_bindgen_futures::spawn_local(async move {
                 let _response = Request::post("http://127.0.0.1:8081/songs")
-                    .json(&Song {
+                    .json(&SongPersist {
                         name: form_data.get("song_title").as_string().unwrap(),
                         source: yt_links,
                         cover: Some(vec![cover_yt_link]),
