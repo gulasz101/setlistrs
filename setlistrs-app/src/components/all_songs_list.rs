@@ -45,9 +45,9 @@ pub fn all_songs_list() -> Html {
         match &*setlist {
             Some(setlist) => {
                 html! {
-                    for setlist.data.iter().map(|song|
+                    for setlist.data.iter().map(|( song_id, song )|
                     html! {
-                        <tr>
+                        <tr data-song_id={ format!("{}", song_id) }>
                             <td>{ song.name.clone() }</td>
                             <td>{ match &song.cover {
                                 Some(cover) => html! {<a href={ cover[0].url.clone() } target="_blank">{
