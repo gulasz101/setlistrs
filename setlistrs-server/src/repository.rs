@@ -2,7 +2,6 @@ use anyhow::Result;
 use setlistrs_types::Song;
 use setlistrs_types::YTLink;
 use sqlx::query;
-use sqlx::query_as;
 use sqlx::Sqlite;
 use sqlx::SqlitePool;
 use sqlx::Transaction;
@@ -38,9 +37,9 @@ ORDER BY id
     .collect();
 
     let song_ids = songs.iter().map(|(song_id, _song)| song_id);
-    let mut covers: Vec<(i64, YTLink)> = Vec::new();
+    let mut covers: Vec<(i64, Vec<YTLink>)> = Vec::new();
     for song_id in song_ids.clone() {
-        covers.push((song_id.clone(), obtain_cover(pool, song_id).await?));
+        covers.push((song_id.clone(), obtain_covers(pool, song_id).await?));
     }
 
     let mut sources: Vec<(i64, Vec<YTLink>)> = Vec::new();
@@ -48,28 +47,45 @@ ORDER BY id
         sources.push((song_id.clone(), obtain_sources(pool, song_id).await?));
     }
 
-    // let test: Vec<Vec<YTLink>> = sources
-    //     .into_iter()
-    //     .map(|(song_id, cover)| cover.clone())
-    //     .collect();
+    let songs_with_relations: Vec<(i64, Song)> = songs
+        .into_iter()
+        .map(|(song_id, song)| {
+            let song_sources: Vec<YTLink> = match sources
+                .iter()
+                .find(|(source_song_id, _yt_link)| *source_song_id == song_id)
+                .map(|(_source_song_id, yt_link)| yt_link)
+                .cloned()
+            {
+                Some(links) => links,
+                None => panic!(),
+            };
 
-    songs.iter().map(|(song_id, song)| {
-        let song_sources: Vec<Vec<YTLink>> = sources
-            .iter()
-            .filter_map(|(source_song_id, yt_link)| match source_song_id {
-                song_id => Some(yt_link),
-                _ => None,
-            })
-            .cloned()
-            .collect();
+            let song_covers: Vec<YTLink> = match covers
+                .iter()
+                .find(|(cover_song_id, _yt_link)| *cover_song_id == song_id)
+                .map(|(_cover_song_id, yt_link)| yt_link)
+                .cloned()
+            {
+                Some(links) => links,
+                None => panic!(),
+            };
 
-        song
-    });
+            (
+                song_id,
+                Song {
+                    name: song.name,
+                    chords: song.chords,
+                    source: song_sources,
+                    cover: Some(song_covers),
+                },
+            )
+        })
+        .collect();
 
-    Ok(songs)
+    Ok(songs_with_relations)
 }
 
-async fn obtain_cover(pool: &SqlitePool, song_id: &i64) -> Result<YTLink> {
+async fn obtain_covers(pool: &SqlitePool, song_id: &i64) -> Result<Vec<YTLink>> {
     Ok(query!(
         r#"
 SELECT l.url, l.display_title FROM covers c, links l 
@@ -86,7 +102,7 @@ ORDER BY c.id
         },
         display_title: link.display_title,
     })
-    .fetch_one(pool)
+    .fetch_all(pool)
     .await?)
 }
 

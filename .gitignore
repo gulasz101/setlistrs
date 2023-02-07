@@ -4,3 +4,5 @@ setlistrs-server/setlistrs.db-shm
 setlistrs-server/setlistrs.db-wal
 target
 setlistrs.db
+setlistrs.db-shm
+setlistrs.db-wal

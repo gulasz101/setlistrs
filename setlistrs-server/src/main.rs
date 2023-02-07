@@ -11,7 +11,7 @@ use sqlx::SqlitePool;
 mod repository;
 
 #[get("/songs")]
-async fn setlist() -> Json<Setlist> {
+async fn setlist(pool: Data<SqlitePool>) -> HttpResponse {
     let mut songs = Vec::new();
 
     songs.push(Song {
@@ -34,7 +34,10 @@ async fn setlist() -> Json<Setlist> {
         chords: "F F#".into(),
     });
 
-    Json(Setlist { data: songs })
+    match crate::repository::list_all_songs(pool.get_ref()).await {
+        Ok(songs) => HttpResponse::Ok().json(Setlist { data: songs }),
+        Err(_e) => HttpResponse::InternalServerError().into(),
+    }
 }
 
 #[post("/songs")]
