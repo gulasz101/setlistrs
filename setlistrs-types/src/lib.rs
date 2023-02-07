@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 
-#[derive(Serialize, Deserialize, Clone, FromRow, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct YTLink {
     pub url: String,
     pub display_title: Option<String>,
