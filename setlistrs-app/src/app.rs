@@ -54,7 +54,7 @@ pub fn nav_items() -> Html {
 pub fn app() -> Html {
     html! {
         <BrowserRouter>
-            <header>
+            <header class={classes!("container")}>
                 <hgroup>
                     <h1>{ "setlistrs" }</h1>
                 </hgroup>
