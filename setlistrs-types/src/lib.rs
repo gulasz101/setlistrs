@@ -31,6 +31,24 @@ pub struct SongDetails {
 }
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Setlist {
+pub struct SongList {
     pub data: Vec<(i64, Song)>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Setlist {
+    pub display_title: String,
+    pub songs: Vec<(i64, SetlistSong)>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SetlistSong {
+    pub display_title: String,
+    pub chords: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NewSetlist {
+    pub display_title: String,
+    pub songs: Vec<i64>,
 }

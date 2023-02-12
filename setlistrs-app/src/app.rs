@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::components::{AddSongForm, AllSongsList};
+use crate::components::{AddSongForm, AllSongsList, SetlistDetails};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -9,6 +9,8 @@ pub enum Route {
     AllSongsList,
     #[at("/add-song")]
     AddSong,
+    #[at("/setlists/:id")]
+    Setlist { id: i64 },
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -18,6 +20,7 @@ fn switch(route: Route) -> Html {
     match route {
         Route::AllSongsList => html! { <AllSongsList /> },
         Route::AddSong => html! { <AddSongForm/> },
+        Route::Setlist { id } => html! { <SetlistDetails seed={id} /> },
         Route::NotFound => html! { <h1> {"404"} </h1> },
     }
 }
