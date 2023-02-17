@@ -74,7 +74,7 @@ pub fn setlist_add(props: &SetlistAddProps) -> Html {
                     Ok(possible_setlist_id) => {
                         let setlist_id: Result<i64, _> = possible_setlist_id.json().await;
                         match setlist_id {
-                            Ok(id) => navigator.push(&Route::Setlist { id }),
+                            Ok(id) => navigator.push(&Route::SetlistDetails { id }),
                             Err(_) => panic!(),
                         }
                     }

@@ -1,5 +1,5 @@
 use gloo_net::http::Request;
-use setlistrs_types::{Setlist, SetlistSong};
+use setlistrs_types::Setlist;
 use yew::{function_component, html, use_effect_with_deps, use_state, AttrValue, Html, Properties};
 
 #[derive(Debug, Clone, Eq, PartialEq, Properties)]

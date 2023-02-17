@@ -1,16 +1,16 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::components::{AddSongForm, AllSongsList, SetlistDetails};
+use crate::components::{SetlistDetails, SongAdd, SongsList};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
     #[at("/")]
-    AllSongsList,
+    SongList,
     #[at("/add-song")]
-    AddSong,
+    SongAdd,
     #[at("/setlists/:id")]
-    Setlist { id: i64 },
+    SetlistDetails { id: i64 },
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -18,9 +18,9 @@ pub enum Route {
 
 fn switch(route: Route) -> Html {
     match route {
-        Route::AllSongsList => html! { <AllSongsList /> },
-        Route::AddSong => html! { <AddSongForm/> },
-        Route::Setlist { id } => html! { <SetlistDetails seed={id} /> },
+        Route::SongList => html! { <SongsList /> },
+        Route::SongAdd => html! { <SongAdd/> },
+        Route::SetlistDetails { id } => html! { <SetlistDetails seed={id} /> },
         Route::NotFound => html! { <h1> {"404"} </h1> },
     }
 }
@@ -31,7 +31,7 @@ pub fn nav_items() -> Html {
 
     let all_songs_list_button = {
         let navigator = navigator.clone();
-        let onclick = Callback::from(move |_| navigator.push(&Route::AllSongsList));
+        let onclick = Callback::from(move |_| navigator.push(&Route::SongList));
         html! {
             <button {onclick}>{ "All songs" }</button>
         }
@@ -39,7 +39,7 @@ pub fn nav_items() -> Html {
 
     let add_song_button = {
         let navigator = navigator.clone();
-        let onclick = Callback::from(move |_| navigator.push(&Route::AddSong));
+        let onclick = Callback::from(move |_| navigator.push(&Route::SongAdd));
         html! {
             <button {onclick}>{ "Add new song" }</button>
         }

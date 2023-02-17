@@ -58,7 +58,7 @@ impl Reducible for YtLinksAdded {
     }
 }
 
-#[function_component(AddSongForm)]
+#[function_component(SongAdd)]
 pub fn add_song_form() -> Html {
     let yt_links_state = use_reducer(|| YtLinksAdded {
         list: Vec::from([1]),
@@ -116,7 +116,7 @@ pub fn add_song_form() -> Html {
                     .send()
                     .await;
 
-                navigator.push(&Route::AllSongsList);
+                navigator.push(&Route::SongList);
             });
         })
     };
