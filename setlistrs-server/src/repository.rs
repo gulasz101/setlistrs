@@ -1,6 +1,7 @@
 use anyhow::Result;
 use setlistrs_types::NewSetlist;
 use setlistrs_types::Setlist;
+use setlistrs_types::SetlistList;
 use setlistrs_types::SetlistSong;
 use setlistrs_types::Song;
 use setlistrs_types::YTLink;
@@ -318,4 +319,26 @@ VALUES(?, ?)
     .execute(transaction)
     .await?
     .last_insert_rowid())
+}
+
+pub async fn obtain_setlists_list(pool: &SqlitePool) -> Result<SetlistList> {
+    Ok(SetlistList {
+        data: query!(
+            r#"
+SELECT s.id, s.display_title FROM setlists s
+ORDER BY s.id
+            "#,
+        )
+        .map(|setlist| {
+            (
+                setlist.id,
+                match setlist.display_title {
+                    Some(display_title) => display_title,
+                    None => panic!(),
+                },
+            )
+        })
+        .fetch_all(pool)
+        .await?,
+    })
 }

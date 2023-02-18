@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::components::{SetlistDetails, SongAdd, SongsList};
+use crate::components::{SetlistDetails, SetlistList, SongAdd, SongsList};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -11,6 +11,8 @@ pub enum Route {
     SongAdd,
     #[at("/setlists/:id")]
     SetlistDetails { id: i64 },
+    #[at("/setlists")]
+    SetlistList,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -21,6 +23,7 @@ fn switch(route: Route) -> Html {
         Route::SongList => html! { <SongsList /> },
         Route::SongAdd => html! { <SongAdd/> },
         Route::SetlistDetails { id } => html! { <SetlistDetails seed={id} /> },
+        Route::SetlistList => html! { <SetlistList /> },
         Route::NotFound => html! { <h1> {"404"} </h1> },
     }
 }
@@ -45,10 +48,19 @@ pub fn nav_items() -> Html {
         }
     };
 
+    let setlist_list = {
+        let navigator = navigator.clone();
+        let onclick = Callback::from(move |_| navigator.push(&Route::SetlistList));
+        html! {
+            <button {onclick}>{ "Setlists" }</button>
+        }
+    };
+
     html! {
         <ul>
             <li>{ all_songs_list_button }</li>
             <li>{ add_song_button }</li>
+            <li>{ setlist_list }</li>
         </ul>
     }
 }

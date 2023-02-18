@@ -65,7 +65,7 @@ pub fn all_songs_list() -> Html {
             />
         </article>
     <table>
-        <caption>{ "Setlist" }</caption>
+        <caption>{ "All songs" }</caption>
         <thead>
             <th>{ "Song" }</th>
             <th>{ "Cover" }</th>

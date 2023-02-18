@@ -52,3 +52,7 @@ pub struct NewSetlist {
     pub display_title: String,
     pub songs: Vec<i64>,
 }
+#[derive(Serialize, Deserialize)]
+pub struct SetlistList {
+    pub data: Vec<(i64, String)>,
+}

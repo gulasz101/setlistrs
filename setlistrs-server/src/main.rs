@@ -63,6 +63,13 @@ async fn setlist_by_id(pool: Data<SqlitePool>, setlist_id: Path<i64>) -> HttpRes
         Err(_e) => HttpResponse::NotFound().into(),
     }
 }
+#[get("/setlists")]
+async fn setlists_list(pool: Data<SqlitePool>) -> HttpResponse {
+    match crate::repository::obtain_setlists_list(pool.get_ref()).await {
+        Ok(setlist_list) => HttpResponse::Ok().json(setlist_list),
+        Err(_e) => HttpResponse::InternalServerError().into(),
+    }
+}
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
@@ -79,6 +86,7 @@ async fn main() -> anyhow::Result<()> {
             .service(persist_song)
             .service(persist_setlist)
             .service(setlist_by_id)
+            .service(setlists_list)
     })
     .bind(("127.0.0.1", 8081))?
     .run()
