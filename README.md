@@ -27,3 +27,5 @@
 - [ ] overwrite chords for song for specific setlist
 - [ ] *Add XHR loader indicator*
 - [ ] *Add notification popup showing error server response*
+- [ ] **Solve all n+1 problems when querying for data**
+- [ ] **Handle batch inserting**
