@@ -15,7 +15,7 @@
 - [ ] Download setlist as valid printable PDF
 - [x] Setlist list view
 - [x] Setlist details view
-- [ ] Setlist deletion
+- [x] Setlist deletion
 ## ACL / Auth
 - [ ] User registration
 - [ ] User login
@@ -25,3 +25,5 @@
 - [ ] chordPro format support for displaying lyrics
 - [ ] download chord pro as PDF
 - [ ] overwrite chords for song for specific setlist
+- [ ] *Add XHR loader indicator*
+- [ ] *Add notification popup showing error server response*

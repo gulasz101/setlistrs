@@ -1,0 +1,15 @@
+header {
+  padding-bottom: unset !important;
+}
+main {
+  padding-top: unset !important;
+}
+
+.red-bg-bd {
+  background-color: darkred;
+  border-color: darkred;
+}
+.red-bg-bd:hover {
+  background-color: red;
+  border-color: red;
+}

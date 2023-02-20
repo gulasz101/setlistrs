@@ -342,3 +342,30 @@ ORDER BY s.id
         .await?,
     })
 }
+
+pub async fn delete_setlist_by_id(pool: &SqlitePool, setlist_id: i64) -> Result<()> {
+    let mut transaction = pool.begin().await?;
+    query!(
+        r#"
+DELETE FROM setlist_to_song_relations
+WHERE setlist_id = ?
+        "#,
+        setlist_id
+    )
+    .execute(&mut transaction)
+    .await?;
+
+    query!(
+        r#"
+DELETE FROM setlists
+WHERE id = ?
+        "#,
+        setlist_id
+    )
+    .execute(&mut transaction)
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(())
+}

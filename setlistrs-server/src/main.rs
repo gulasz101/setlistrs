@@ -2,7 +2,7 @@ use std::env;
 
 use actix_cors::Cors;
 use actix_web::web::{Data, Json, Path};
-use actix_web::HttpResponse;
+use actix_web::{delete, HttpResponse};
 use actix_web::{get, post, App, HttpServer};
 use dotenvy::dotenv;
 use setlistrs_types::{NewSetlist, Song, SongList, YTLink};
@@ -70,6 +70,14 @@ async fn setlists_list(pool: Data<SqlitePool>) -> HttpResponse {
         Err(_e) => HttpResponse::InternalServerError().into(),
     }
 }
+#[delete("/setlists/{setlist_id}")]
+async fn setlist_delete_by_id(pool: Data<SqlitePool>, setlist_id: Path<i64>) -> HttpResponse {
+    match crate::repository::delete_setlist_by_id(pool.get_ref(), setlist_id.into_inner()).await {
+        Ok(_) => HttpResponse::NoContent().into(),
+        Err(_e) => HttpResponse::InternalServerError().into(),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
@@ -87,6 +95,7 @@ async fn main() -> anyhow::Result<()> {
             .service(persist_setlist)
             .service(setlist_by_id)
             .service(setlists_list)
+            .service(setlist_delete_by_id)
     })
     .bind(("127.0.0.1", 8081))?
     .run()
