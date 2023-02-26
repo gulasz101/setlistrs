@@ -1,14 +1,11 @@
-use std::os::fd::OwnedFd;
-
 use gloo_net::http::Request;
 
 use setlistrs_types::SetlistList as SetlistListModel;
 use web_sys::{HtmlElement, MouseEvent};
 use yew::{
-    classes, function_component, html, use_reducer, use_state, Callback, Html, Reducible,
-    TargetCast, UseStateHandle,
+    classes, function_component, html, use_effect_with_deps, use_reducer, use_state, AttrValue,
+    Callback, Html, Properties, Reducible, TargetCast,
 };
-use yew::{use_effect_with_deps, AttrValue, Properties};
 use yew_router::prelude::use_navigator;
 
 use crate::app::Route;

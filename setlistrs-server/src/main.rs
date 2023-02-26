@@ -48,6 +48,18 @@ async fn persist_song(song: Json<Song>, pool: Data<SqlitePool>) -> HttpResponse 
     }
 }
 
+#[delete("/songs/{song_id}")]
+async fn delete_song_by_id(pool: Data<SqlitePool>, song_id: Path<i64>) -> HttpResponse {
+    match crate::repository::mark_song_as_deleted(pool.get_ref(), song_id.into_inner()).await {
+        Ok(rows_affected) => match rows_affected {
+            1 => HttpResponse::NoContent(),
+            _ => HttpResponse::BadRequest(),
+        },
+        Err(_e) => HttpResponse::InternalServerError(),
+    }
+    .into()
+}
+
 #[post("/setlists")]
 async fn persist_setlist(pool: Data<SqlitePool>, new_setlist: Json<NewSetlist>) -> HttpResponse {
     match crate::repository::persist_setlist(pool.get_ref(), new_setlist.into_inner()).await {
@@ -92,6 +104,7 @@ async fn main() -> anyhow::Result<()> {
             .wrap(cors)
             .service(setlist)
             .service(persist_song)
+            .service(delete_song_by_id)
             .service(persist_setlist)
             .service(setlist_by_id)
             .service(setlists_list)

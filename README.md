@@ -3,7 +3,7 @@
 ### Song
 - [x] List of all available songs
 - [ ] Song details / edit view 
-- [ ] Song deletion
+- [x] Song deletion
 - [x] Song creation view
 - [ ] Song creation view -> multiple sources
 - [ ] Song creation view -> multiple covers

@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::Utc;
 use setlistrs_types::NewSetlist;
 use setlistrs_types::Setlist;
 use setlistrs_types::SetlistList;
@@ -15,6 +16,7 @@ pub async fn list_all_songs(pool: &SqlitePool) -> Result<Vec<(i64, Song)>> {
         r#"
 SELECT id, name, chords 
 FROM songs
+WHERE deleted_at IS NULL
 ORDER BY id
         "#
     )
@@ -232,6 +234,20 @@ async fn persist_song_link_relation(
     .execute(transaction)
     .await?
     .last_insert_rowid())
+}
+
+pub async fn mark_song_as_deleted(pool: &SqlitePool, song_id: i64) -> Result<i64> {
+    let timestamp = Utc::now().timestamp();
+    Ok(query!(
+        r#"
+UPDATE songs SET deleted_at = ? WHERE id = ?
+        "#,
+        timestamp,
+        song_id,
+    )
+    .execute(pool)
+    .await?
+    .rows_affected() as i64)
 }
 
 pub async fn obtain_setlist_by_id(pool: &SqlitePool, setlist_id: i64) -> Result<Setlist> {

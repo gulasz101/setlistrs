@@ -1,0 +1,5 @@
+procs:
+  webserver:
+    shell: "cargo watch -x 'run -p setlistrs-server'"
+  webapp:
+    shell: "cd setlistrs-app && trunk serve"

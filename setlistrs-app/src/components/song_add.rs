@@ -124,7 +124,7 @@ pub fn add_song_form() -> Html {
     html! {
         <article>
             <form onsubmit={onsubmit}>
-                <input name="song_title" placeholder={"song title"} value={"get lucky"}/>
+                <input name="song_title" placeholder={"song title"} />
                 {
                     for yt_links_state.list.iter().cloned().map(|last_id|
                         html! {
@@ -133,10 +133,10 @@ pub fn add_song_form() -> Html {
                     )
                 }
 
-                <input name="cover_url" placeholder={"cover url"} value={"http//get-lucky.yt"}/>
-                <input name="cover_title" placeholder={"cover display title"} value={"get lucky at metro"}/>
+                <input name="cover_url" placeholder={"cover url"} />
+                <input name="cover_title" placeholder={"cover display title"} />
 
-                <input name="chords" placeholder={"chords, ex: b G D A"} value={"C D G E"}/>
+                <input name="chords" placeholder={"chords, ex: b G D A"} />
 
                 <button type={"submit"} >{ "Add new song" }</button>
             </form>

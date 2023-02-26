@@ -6,3 +6,4 @@ target
 setlistrs.db
 setlistrs.db-shm
 setlistrs.db-wal
+setlistrs-server/.env
