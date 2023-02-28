@@ -134,41 +134,41 @@ pub fn all_songs_list() -> Html {
                 disabled={&(*songs_for_setlist).data.is_empty()}
             />
         </article>
-    <table>
-        <caption>{ "All songs" }</caption>
-        <thead>
-            <th>{ "Add to setlist" }</th>
-            <th>{ "Song" }</th>
-            <th>{ "Cover" }</th>
-            <th>{ "Chords" }</th>
-            <th>{ "Action" }</th>
-        </thead>
-        <tbody>
-        {
-            html! {
-                for (*setlist).songs.iter().map(|( song_id, song )|
+        <table>
+            <caption>{ "All songs" }</caption>
+            <thead>
+                <th>{ "Add to setlist" }</th>
+                <th>{ "Song" }</th>
+                <th>{ "Cover" }</th>
+                <th>{ "Chords" }</th>
+                <th>{ "Action" }</th>
+            </thead>
+            <tbody>
+            {
                 html! {
-                    <tr data-song_id={ format!("{}", song_id) }>
-                        <td><input type="checkbox" name="song" onclick={ on_song_checkbox_click.clone() } value={ format!("{}", song_id) }/></td>
-                        <td>{ song.name.clone() }</td>
-                        <td>{ match &song.cover {
-                            Some(cover) => html! {<a href={ cover[0].url.clone() } target="_blank">{
-                                match cover[0].display_title.clone() {
-                                    Some(display_title) => display_title,
-                                    None => cover[0].url.clone(),
+                    for (*setlist).songs.iter().map(|( song_id, song )|
+                    html! {
+                        <tr data-song_id={ format!("{}", song_id) }>
+                            <td><input type="checkbox" name="song" onclick={ on_song_checkbox_click.clone() } value={ format!("{}", song_id) }/></td>
+                            <td>{ song.name.clone() }</td>
+                            <td>{ match &song.cover {
+                                Some(cover) => html! {<a href={ cover[0].url.clone() } target="_blank">{
+                                    match cover[0].display_title.clone() {
+                                        Some(display_title) => display_title,
+                                        None => cover[0].url.clone(),
+                                    }
+                                }</a>},
+                                None => "".into(),
                                 }
-                            }</a>},
-                            None => "".into(),
-                            }
-                        }</td>
-                        <td>{ song.chords.clone() }</td>
-                        <td><button onclick={ on_song_delete_click.clone() } data-song-id={ format!("{}", song_id) } class={classes!("red-bg-bd")}>{"Delete"}</button></td>
-                    </tr>
-                })
+                            }</td>
+                            <td>{ song.chords.clone() }</td>
+                            <td><button onclick={ on_song_delete_click.clone() } data-song-id={ format!("{}", song_id) } class={classes!("red-bg-bd")}>{"Delete"}</button></td>
+                        </tr>
+                    })
+                }
             }
-        }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     </>
     }
 }
