@@ -2,78 +2,161 @@ use std::ops::Deref;
 
 use gloo_net::http::Request;
 use setlistrs_types::{Song, YTLink};
-use web_sys::FormData;
+use web_sys::{Element, FormData};
 use yew::prelude::*;
 use yew_router::prelude::use_navigator;
 
 use crate::app::Route;
 
 #[derive(Clone, PartialEq, Properties)]
-struct YtLinkProps {
-    pub last_id: i32,
-    pub onadd: Callback<i32>,
+struct LinkWithDisplayTitleProps {
+    pub input_name_prefix: String,
+    pub entries_list: LinkWithDisplayTitleIdList,
+    pub on_add: Callback<()>,
+    pub on_remove: Callback<i32>,
+    pub min_entries_count: Option<i32>,
 }
 
-#[function_component(AddYTLink)]
-fn add_yt_link(props: &YtLinkProps) -> Html {
-    let on_another_link_click = {
-        let onadd = props.onadd.clone();
-        let last_id = props.last_id.clone();
-
-        Callback::from(move |event: MouseEvent| {
-            event.prevent_default();
-            onadd.emit((last_id + 1) as i32);
+#[function_component(LinkWithDisplayTitle)]
+fn link_with_display_title(
+    LinkWithDisplayTitleProps {
+        input_name_prefix,
+        entries_list,
+        on_add,
+        on_remove,
+        min_entries_count,
+    }: &LinkWithDisplayTitleProps,
+) -> Html {
+    let on_plus_click = {
+        let on_add = on_add.clone();
+        Callback::from(move |e: MouseEvent| {
+            e.prevent_default();
+            on_add.emit(())
         })
     };
+
+    let on_minus_click = {
+        let on_remove = on_remove.clone();
+        Callback::from(move |e: MouseEvent| {
+            e.prevent_default();
+            let button: Element = e.target_unchecked_into();
+
+            on_remove.emit(
+                button
+                    .get_attribute("data-entity_id")
+                    .expect("There is always a number here")
+                    .parse::<i32>()
+                    .expect("There is always a number here"),
+            );
+        })
+    };
+
+    let display_minus_button = min_entries_count.is_none()
+        || (min_entries_count.is_some()
+            && min_entries_count.expect("Value is hardcoded")
+                < entries_list.list.len().try_into().unwrap());
+
     html! {
-        <div class={classes!("grid")}>
-            <input name={ format!("url_title_{}", props.last_id.clone().to_string()) } placeholder={"url title"}/>
-            <input name={ format!("url_{}", props.last_id.clone().to_string()) } placeholder={"yt-url"}/>
-            <button title={"Another link"} onclick={on_another_link_click}>{"+"}</button>
-        </div>
+        <>
+
+        {
+            for entries_list.list.iter().map(|entry_id| html! {
+                <div class={classes!("grid")}>
+                    <input name={ format!("{}_display_title_{}", input_name_prefix, entry_id) } placeholder={ "Title" } />
+                    <input name={ format!("{}_url_{}", input_name_prefix, entry_id) } placeholder={ "Url" } />
+                    {
+                        if display_minus_button {
+                            html! {
+                            <button data-entity_id={entry_id.to_string()} title={"Remove link"} class={classes!("red-bg-bd")} onclick={on_minus_click.clone()}>{"-"}</button>
+                        }
+                        } else { html!{""} }
+                    }
+                </div>
+            })
+        }
+
+        <button title={"Add one more link"} onclick={on_plus_click}>{"+"}</button>
+        </>
     }
 }
 
-enum YtLinksAddedAction {
-    Add(i32),
+enum LinkWithDisplayTitleAction {
+    Add(),
+    Remove(i32),
 }
 
-struct YtLinksAdded {
+#[derive(Clone, PartialEq)]
+struct LinkWithDisplayTitleIdList {
     pub list: Vec<i32>,
+    pub last_added: i32,
 }
 
-impl Reducible for YtLinksAdded {
-    type Action = YtLinksAddedAction;
+impl Reducible for LinkWithDisplayTitleIdList {
+    type Action = LinkWithDisplayTitleAction;
 
     fn reduce(self: std::rc::Rc<Self>, action: Self::Action) -> std::rc::Rc<Self> {
         match action {
-            YtLinksAddedAction::Add(value) => {
+            LinkWithDisplayTitleAction::Add() => {
                 let mut list = self.list.clone();
+                let new_last_added_id = self.last_added + 1;
 
-                list.push(value);
+                list.push(new_last_added_id);
 
-                YtLinksAdded { list: list }.into()
+                LinkWithDisplayTitleIdList {
+                    last_added: new_last_added_id,
+                    list,
+                }
+            }
+            LinkWithDisplayTitleAction::Remove(list_entry_id) => {
+                let mut list = self.list.clone();
+                let last_added = self.last_added;
+
+                list.retain(|list_entry| *list_entry != list_entry_id);
+
+                LinkWithDisplayTitleIdList { last_added, list }
             }
         }
+        .into()
     }
 }
 
 #[function_component(SongAdd)]
 pub fn add_song_form() -> Html {
-    let yt_links_state = use_reducer(|| YtLinksAdded {
+    let yt_links_state = use_reducer(|| LinkWithDisplayTitleIdList {
+        last_added: 1,
+        list: Vec::from([1]),
+    });
+    let covers_links_state = use_reducer(|| LinkWithDisplayTitleIdList {
+        last_added: 1,
         list: Vec::from([1]),
     });
     let navigator = use_navigator().expect("There is no reason it will not work.");
 
     let on_yt_link_add = {
         let yt_links_state = yt_links_state.clone();
-        Callback::from(move |value: i32| {
-            yt_links_state.dispatch(YtLinksAddedAction::Add(value));
+        Callback::from(move |_: ()| yt_links_state.dispatch(LinkWithDisplayTitleAction::Add()))
+    };
+    let on_yt_link_rm = {
+        let yt_links_state = yt_links_state.clone();
+        Callback::from(move |entity_id: i32| {
+            yt_links_state.dispatch(LinkWithDisplayTitleAction::Remove(entity_id))
+        })
+    };
+
+    let on_cover_add = {
+        let covers_links_state = covers_links_state.clone();
+        Callback::from(move |_: ()| covers_links_state.dispatch(LinkWithDisplayTitleAction::Add()))
+    };
+    let on_cover_rm = {
+        let covers_links_state = covers_links_state.clone();
+        Callback::from(move |entity_id: i32| {
+            covers_links_state.dispatch(LinkWithDisplayTitleAction::Remove(entity_id))
         })
     };
 
     let onsubmit = {
         let yt_links_state = yt_links_state.clone();
+        let covers_links_state = covers_links_state.clone();
         let navigator = navigator.clone();
 
         Callback::from(move |e: SubmitEvent| {
@@ -88,28 +171,37 @@ pub fn add_song_form() -> Html {
                 .list
                 .iter()
                 .map(|link_id| YTLink {
-                    url: match form_data.get(&format!("url_{}", link_id)).as_string() {
+                    url: match form_data.get(&format!("yt_url_{}", link_id)).as_string() {
                         Some(url) => url.into(),
                         None => todo!(),
                     },
-                    display_title: form_data.get(&format!("url_title_{}", link_id)).as_string(),
+                    display_title: form_data
+                        .get(&format!("yt_display_title_{}", link_id))
+                        .as_string(),
                 })
                 .collect();
 
-            let cover_yt_link = YTLink {
-                url: match form_data.get("cover_url").as_string() {
-                    Some(value) => value,
-                    None => todo!(),
-                },
-                display_title: form_data.get("cover_title").as_string(),
-            };
+            let cover_links: Vec<YTLink> = covers_links_state
+                .deref()
+                .list
+                .iter()
+                .map(|link_id| YTLink {
+                    url: match form_data.get(&format!("cover_url_{}", link_id)).as_string() {
+                        Some(url) => url.into(),
+                        None => todo!(),
+                    },
+                    display_title: form_data
+                        .get(&format!("cover_display_title_{}", link_id))
+                        .as_string(),
+                })
+                .collect();
 
             wasm_bindgen_futures::spawn_local(async move {
                 let _response = Request::post("http://127.0.0.1:8081/songs")
                     .json(&Song {
                         name: form_data.get("song_title").as_string().unwrap(),
                         source: yt_links,
-                        cover: Some(vec![cover_yt_link]),
+                        cover: Some(cover_links),
                         chords: form_data.get("chords").as_string().unwrap(),
                     })
                     .expect("This will work")
@@ -122,24 +214,32 @@ pub fn add_song_form() -> Html {
     };
 
     html! {
-        <article>
-            <form onsubmit={onsubmit}>
-                <input name="song_title" placeholder={"song title"} />
-                {
-                    for yt_links_state.list.iter().cloned().map(|last_id|
-                        html! {
-                            <AddYTLink last_id={last_id.clone()} onadd={on_yt_link_add.clone()} />
-                        }
-                    )
-                }
+    <article>
+        <form onsubmit={onsubmit}>
+            <input name="song_title" placeholder={"song title"} />
+            <fieldset>
+                <legend>{"Sources links"}</legend>
+                <LinkWithDisplayTitle
+                    input_name_prefix={"yt"}
+                    entries_list={(*yt_links_state).clone()}
+                    on_add={on_yt_link_add.clone()}
+                    on_remove={on_yt_link_rm.clone()}
+                    min_entries_count={1}
+                />
+            </fieldset>
+            <fieldset>
+                <legend>{"Covers"}</legend>
+                <LinkWithDisplayTitle
+                    input_name_prefix={"cover"}
+                    entries_list={(*covers_links_state).clone()}
+                    on_add={on_cover_add.clone()}
+                    on_remove={on_cover_rm.clone()}
+                />
+            </fieldset>
+            <input name="chords" placeholder={"chords, ex: b G D A"} />
 
-                <input name="cover_url" placeholder={"cover url"} />
-                <input name="cover_title" placeholder={"cover display title"} />
-
-                <input name="chords" placeholder={"chords, ex: b G D A"} />
-
-                <button type={"submit"} >{ "Add new song" }</button>
-            </form>
-        </article>
-    }
+            <button type={"submit"} >{ "Add new song" }</button>
+        </form>
+    </article>
+        }
 }

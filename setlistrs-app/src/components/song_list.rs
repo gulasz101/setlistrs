@@ -150,15 +150,42 @@ pub fn all_songs_list() -> Html {
                     html! {
                         <tr data-song_id={ format!("{}", song_id) }>
                             <td><input type="checkbox" name="song" onclick={ on_song_checkbox_click.clone() } value={ format!("{}", song_id) }/></td>
-                            <td>{ song.name.clone() }</td>
-                            <td>{ match &song.cover {
-                                Some(cover) => html! {<a href={ cover[0].url.clone() } target="_blank">{
-                                    match cover[0].display_title.clone() {
-                                        Some(display_title) => display_title,
-                                        None => cover[0].url.clone(),
+                            <td>{
+                                html! {<>
+                                    <p>{ song.name.clone() }</p>
+                                    {for song.source.iter().map(|cover| html!
+                                        {
+                                            <li>
+                                                <a href={ cover.url.clone() } target="_blank">{
+                                                match cover.display_title.clone() {
+                                                    Some(display_title) => display_title,
+                                                    None => cover.url.clone(),
+                                                }
+                                                }</a>
+                                            </li>
+                                        })
                                     }
-                                }</a>},
-                                None => "".into(),
+                                    </>
+                                }
+
+                            }</td>
+                            <td>{
+                                match &song.cover {
+                                    Some(covers) => html! {
+                                        for covers.iter().map(|cover| html!
+                                        {
+                                            <li>
+                                                <a href={ cover.url.clone() } target="_blank">{
+                                                match cover.display_title.clone() {
+                                                    Some(display_title) => display_title,
+                                                    None => cover.url.clone(),
+                                                }
+                                                }</a>
+                                            </li>
+                                        }
+                                        )
+                                    },
+                                    None => "".into(),
                                 }
                             }</td>
                             <td>{ song.chords.clone() }</td>
