@@ -29,3 +29,23 @@
 - [ ] *Add notification popup showing error server response*
 - [ ] **Solve all n+1 problems when querying for data**
 - [ ] **Handle batch inserting**
+
+### DEVELOPMENT
+## Root dependencies
+- *Yew* -> https://yew.rs/
+- *Actix Web* -> https://actix.rs/docs/whatis
+- *sqlx* that is not an ORM -> https://github.com/launchbadge/sqlx#install
+- *sqlx cli* (for running migrations) -> https://github.com/launchbadge/sqlx/tree/main/sqlx-cli
+- *sqlite*
+- *picocss* as I can not do frontend -> https://picocss.com/
+## Useful addons
+- *mprocs* to run web server and build front app in little bit more convenient way
+- *cargo watch* -> https://github.com/watchexec/cargo-watch (to build backend on every change of source file)
+## Steps to run application
+- install rust :sunglasses: https://rustup.rs/
+- install WebAssembly target: ```rustup target add wasm32-unknown-unknown```
+- install *trunk* `cargo install --locked trunk`
+- if database migrations not working move copy *.env* file to *setlistrs-server* dir
+- create database `sqlx database create`
+- run migrations: `sqlx migrate run`
+- run *mprocs* so it will use predefined config or run `cargo run -p setlistrs-server` and from **setlistr-app** dir run `trunk server`
