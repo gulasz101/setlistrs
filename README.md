@@ -5,8 +5,8 @@
 - [ ] Song details / edit view 
 - [x] Song deletion
 - [x] Song creation view
-- [ ] Song creation view -> multiple sources
-- [ ] Song creation view -> multiple covers
+- [x] Song creation view -> multiple sources
+- [x] Song creation view -> multiple covers
 - [ ] **Song creation view -> validation on submit** (client side, server may fail)
 ### Setlist
 - [x] Add song to new setlist (from song list view)
