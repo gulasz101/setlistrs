@@ -46,6 +46,7 @@
 - install WebAssembly target: ```rustup target add wasm32-unknown-unknown```
 - install *trunk* `cargo install --locked trunk`
 - if database migrations not working move copy *.env* file to *setlistrs-server* dir
+- install sqlx cli if it isn't installed already `cargo install sqlx-cli`
 - create database `sqlx database create`
 - run migrations: `sqlx migrate run`
 - run *mprocs* so it will use predefined config or run `cargo run -p setlistrs-server` and from **setlistr-app** dir run `trunk server`
