@@ -1,5 +1,17 @@
 procs:
-  webserver:
-    shell: "cargo watch -x 'run -p setlistrs-server'"
+  webserver-dev:
+    cwd: setlistrs-server
+    shell: cargo watch -x run -p setlistrs-server
+    autostart: false
+  webserver-docker:
+    shell: docker build -f ./setlistrs-server/Dockerfile -t setlistrs-server .
+    autostart: false
+  webserver-docker-run:
+    shell: docker run -p 8081:8081 -v setlistrs-db:/database setlistrs-server
+    autostart: false
   webapp:
-    shell: "cd setlistrs-app && trunk serve"
+    cwd: setlistrs-app
+    shell: trunk serve
+  htop:
+    shell: "htop || echo 'no htop'"
+    autostart: false

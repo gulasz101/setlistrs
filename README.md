@@ -45,7 +45,17 @@
 - install rust :sunglasses: https://rustup.rs/
 - install WebAssembly target: ```rustup target add wasm32-unknown-unknown```
 - install *trunk* `cargo install --locked trunk`
-- if database migrations not working move copy *.env* file to *setlistrs-server* dir
+- navigate to **setlistr-app** directory and run `trunk serve`
+### For frontend development you do need only to run setlistrs-server container
+- [install docker](https://docs.docker.com/get-docker/)
+- ```docker build -f ./setlistrs-server/Dockerfile -t setlistrs-server .```
+- ```docker run -p 8081:8081 -v setlistrs-db:/database setlistrs-server```
+### If planning to manipulate backend:
+- navigate to **setlistrs-server**
 - create database `sqlx database create`
 - run migrations: `sqlx migrate run`
-- run *mprocs* so it will use predefined config or run `cargo run -p setlistrs-server` and from **setlistr-app** dir run `trunk server`
+- run `cargo watch -x run -p setlistrs-server`
+### Alternatively you can just assuming you have docker installed you can run everything from *mprocs*
+- install [mprocs](https://github.com/pvolok/mprocs#installation)
+- run it `mprocs`
+- configuration of *mprocs* is self explanatory, to list commands simply `cat mprocs.yaml`

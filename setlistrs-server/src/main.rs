@@ -24,7 +24,7 @@ async fn main() -> anyhow::Result<()> {
             .configure(song::init)
             .configure(setlist::init)
     })
-    .bind(("127.0.0.1", 8081))?
+    .bind(("0.0.0.0", 8081))?
     .run()
     .await?;
 
