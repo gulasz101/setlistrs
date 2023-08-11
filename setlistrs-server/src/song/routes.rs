@@ -33,7 +33,7 @@ async fn delete(pool: Data<SqlitePool>, song_id: Path<i64>) -> impl Responder {
             1 => HttpResponse::NoContent(),
             _ => HttpResponse::BadRequest(),
         }
-        .into(),
+        .finish(),
         Err(e) => HttpResponse::InternalServerError().body(format!("{}", e)),
     }
 }

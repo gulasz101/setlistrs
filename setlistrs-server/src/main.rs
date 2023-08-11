@@ -16,6 +16,16 @@ async fn main() -> anyhow::Result<()> {
     let dsn = env::var("DATABASE_URL").expect("DATABASE_URL has to be set");
     let pool = sqlx::SqlitePool::connect(&dsn).await?;
 
+    let host = match env::var("SETLISTRS_HOST") {
+        Ok(host) => host,
+        Err(_) => "0.0.0.0".into(),
+    };
+
+    let port: u16 = match env::var("SETLISTRS_PORT") {
+        Ok(port) => port.parse().expect("port has to be u16"),
+        Err(_) => 8081,
+    };
+
     HttpServer::new(move || {
         let cors = Cors::permissive(); // TODO -> setup cors proper way
         App::new()
@@ -24,7 +34,7 @@ async fn main() -> anyhow::Result<()> {
             .configure(song::init)
             .configure(setlist::init)
     })
-    .bind(("0.0.0.0", 8081))?
+    .bind((host, port))?
     .run()
     .await?;
 

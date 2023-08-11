@@ -40,7 +40,7 @@ async fn create(pool: Data<SqlitePool>, new_setlist: Json<NewSetlist>) -> impl R
 #[delete("/setlists/{setlist_id}")]
 async fn delete(pool: Data<SqlitePool>, setlist_id: Path<i64>) -> impl Responder {
     match repository::delete(pool.get_ref(), setlist_id.into_inner()).await {
-        Ok(_) => HttpResponse::NoContent().into(),
+        Ok(_) => HttpResponse::NoContent().finish(),
         Err(e) => HttpResponse::InternalServerError().body(format!("{}", e)),
     }
 }
